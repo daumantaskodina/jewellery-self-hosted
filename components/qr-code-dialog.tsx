@@ -33,7 +33,7 @@ export default function QRCodeDialog({ open, onOpenChange }: QRCodeDialogProps) 
         <div className="p-6 pt-4">
           <div className="flex items-center justify-center">
             <Image
-              src="https://pr6jindruf6ikbp6.public.blob.vercel-storage.com/qr-code.png"
+              src="https://pr6jindruf6ikbp6.public.blob.vercel-storage.com/QR%20Code%20Metal%20Alloys-VSOldHe52HNppoFBiWJV8KPOPZY5aW.webp"
               alt="QR Code to share this page"
               width={280}
               height={280}

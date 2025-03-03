@@ -26,7 +26,7 @@ export function useMetalPrices() {
 
     fetchPrices()
 
-    // Refresh prices every hour
+    // Check for updates every hour, though prices update at 7:00 AM each day
     const interval = setInterval(fetchPrices, 60 * 60 * 1000)
 
     return () => clearInterval(interval)
