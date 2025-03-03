@@ -10,13 +10,13 @@ export const metadata: Metadata = {
   description: "Calculate required metal amounts for jewelry casting",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
     title: "Metal Alloys",
+    statusBarStyle: "default"
   },
   icons: {
-    icon: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/rounded-Ui8WzEhGncLDllkjAuLfXHquDyvAVU.png",
-    apple: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/rounded-Ui8WzEhGncLDllkjAuLfXHquDyvAVU.png",
-  },
+    icon: "https://pr6jindruf6ikbp6.public.blob.vercel-storage.com/Metal%20Alloys%20Rounded%20%281%29-O2faxoBEymSegkQrim4oSf46r43tTo.webp",
+    apple: "https://pr6jindruf6ikbp6.public.blob.vercel-storage.com/Metal%20Alloys%20Rounded%20%281%29-O2faxoBEymSegkQrim4oSf46r43tTo.webp",
+  }
 }
 
 export const viewport: Viewport = {
@@ -25,7 +25,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  viewportFit: "cover",
+  viewportFit: "cover"
 }
 
 export default function RootLayout({
@@ -35,20 +35,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Metal Alloys" />
-        <link
-          rel="apple-touch-icon"
-          href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/rounded-Ui8WzEhGncLDllkjAuLfXHquDyvAVU.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/rounded-Ui8WzEhGncLDllkjAuLfXHquDyvAVU.png"
-        />
-      </head>
+      <head />
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"

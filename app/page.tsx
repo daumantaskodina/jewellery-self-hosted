@@ -1,4 +1,4 @@
-import ClientPage from "@/app/ClientPage"
+import ClientPage from "./ClientPage"
 
 export default function Home() {
   return <ClientPage />

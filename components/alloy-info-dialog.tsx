@@ -7,21 +7,22 @@ import {
   DialogClose,
 } from "@/components/ui/dialog"
 import { X } from "lucide-react"
+import { type Alloy, calculateAlloyPrice } from "@/lib/alloys"
+import { useMetalPrices } from "@/hooks/use-metal-prices"
 
 interface AlloyInfoDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  alloy: {
-    name: string
-    image: string
-    description: string
-    uses: string
-    pricePerGram: number
-  } | null
+  alloy: Alloy | null
 }
 
 export default function AlloyInfoDialog({ open, onOpenChange, alloy }: AlloyInfoDialogProps) {
+  const { prices: metalPricesData } = useMetalPrices()
+  const metalPrices = metalPricesData?.prices
+
   if (!alloy) return null
+
+  const pricePerGram = metalPrices ? calculateAlloyPrice(alloy, metalPrices) : null
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -54,7 +55,9 @@ export default function AlloyInfoDialog({ open, onOpenChange, alloy }: AlloyInfo
             <div className="rounded-md bg-muted p-3">
               <div className="text-sm">
                 <span className="font-medium">Estimated Alloy Price: </span>
-                <span className="text-muted-foreground">€{alloy.pricePerGram.toFixed(2)}/g</span>
+                <span className="text-muted-foreground">
+                  {pricePerGram ? `€${pricePerGram.toFixed(2)}/g` : "Loading..."}
+                </span>
               </div>
             </div>
           </div>

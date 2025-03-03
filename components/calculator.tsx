@@ -4,8 +4,9 @@ import { useState, useRef } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-import { alloys } from "@/lib/alloys"
+import { alloys, calculateAlloyPrice, calculateComponentPrices, type Alloy } from "@/lib/alloys"
 import { getConversionMultiplier } from "@/lib/materials"
+import { useMetalPrices } from "@/hooks/use-metal-prices"
 import { Card, CardContent } from "@/components/ui/card"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -30,8 +31,10 @@ const formSchema = z.object({
 
 export default function Calculator() {
   const [results, setResults] = useState<any>(null)
-  const [selectedAlloyInfo, setSelectedAlloyInfo] = useState<(typeof alloys)[0] | null>(null)
+  const [selectedAlloyInfo, setSelectedAlloyInfo] = useState<Alloy | null>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
+  const { prices: metalPricesData, loading, error } = useMetalPrices()
+  const metalPrices = metalPricesData?.prices
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,7 +52,7 @@ export default function Calculator() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     const selectedAlloy = alloys.find((alloy) => alloy.id === values.targetAlloy)
 
-    if (!selectedAlloy) {
+    if (!selectedAlloy || !metalPrices) {
       return
     }
 
@@ -66,21 +69,20 @@ export default function Calculator() {
     const existingAlloyWeight = values.hasExistingAlloy ? values.existingAlloyWeight : 0
     const additionalWeightNeeded = Math.max(0, totalWeightWithSurplus - existingAlloyWeight)
 
-    // Calculate metal components with pricing
-    const metalComponents = selectedAlloy.components.map((component) => {
+    // Calculate metal components with real-time pricing
+    const metalComponents = calculateComponentPrices(selectedAlloy, metalPrices).map(component => {
       const weight = additionalWeightNeeded * (component.percentage / 100)
       const cost = weight * component.pricePerGram
       return {
-        name: component.name,
-        percentage: component.percentage,
+        ...component,
         weight,
-        pricePerGram: component.pricePerGram,
         cost,
       }
     })
 
-    // Calculate total cost
+    // Calculate total cost using real-time prices
     const totalCost = metalComponents.reduce((sum, component) => sum + component.cost, 0)
+    const alloyPricePerGram = calculateAlloyPrice(selectedAlloy, metalPrices)
 
     setResults({
       materialWeight: values.materialWeight,
@@ -93,7 +95,7 @@ export default function Calculator() {
       metalComponents,
       totalCost,
       alloyName: selectedAlloy.name,
-      alloyPricePerGram: selectedAlloy.pricePerGram,
+      alloyPricePerGram,
     })
 
     // Check if we're in mobile view (one column layout)

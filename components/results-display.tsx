@@ -136,7 +136,7 @@ export default function ResultsDisplay({ results }: ResultsDisplayProps) {
                       onClick={() => setEditingPrices(!editingPrices)}
                       className="mb-2"
                     >
-                      {editingPrices ? "Done editing" : "Edit metal prices"}
+                      {editingPrices ? "Done editing" : "Override metal prices"}
                     </Button>
                     {calculatedCosts.map((component, index) => (
                       <div key={index} className="grid gap-2 text-sm">

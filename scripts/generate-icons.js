@@ -3,7 +3,7 @@ import https from "https"
 import { promises as fs } from "fs"
 
 const sourceImageUrl =
-  "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-03-02%20at%2015.31.43-uFLRtWXWD4BqV54zHkp66FmUWgtoIV.png"
+  "https://pr6jindruf6ikbp6.public.blob.vercel-storage.com/Metal%20Alloys%20Rounded%20%281%29-O2faxoBEymSegkQrim4oSf46r43tTo.webp"
 const sizes = [192, 512]
 
 async function downloadImage(url) {
