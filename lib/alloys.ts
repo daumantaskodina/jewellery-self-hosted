@@ -2,7 +2,7 @@ export const alloys = [
   {
     id: "sterling-silver",
     name: "Sterling Silver",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/argentum-Olckop5lLUWCeX3gAWqZjOVYm1T80O.webp", // Using Argentium image as it shows similar properties
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/argentum-Olckop5lLUWCeX3gAWqZjOVYm1T80O.webp",
     description:
       "The most common silver alloy used in jewelry making. Perfect for everyday wear jewelry due to its durability and beautiful luster.",
     uses: "Commonly used for rings, necklaces, bracelets, and decorative items. Ideal for intricate designs and filigree work.",
@@ -70,7 +70,7 @@ export const alloys = [
   {
     id: "white-gold-14k",
     name: "14K White Gold",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/argentum-Olckop5lLUWCeX3gAWqZjOVYm1T80O.webp", // Using Argentium image as it shows similar white color
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/argentum-Olckop5lLUWCeX3gAWqZjOVYm1T80O.webp",
     description:
       "Modern alternative to platinum. Bright white color achieved through palladium alloy and rhodium plating.",
     uses: "Popular for engagement rings, wedding bands, and modern jewelry designs. Good alternative to platinum.",

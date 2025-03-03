@@ -26,7 +26,6 @@ export const conversionMatrix = {
     brass: 0.825,
     shibuichi: 0.942,
   },
-  // Add reciprocal values for other materials
   "argentium-silver": {
     wax: 0.098,
     "sterling-silver": 1.005,
@@ -39,8 +38,7 @@ export const conversionMatrix = {
     bronze: 0.859,
     brass: 0.829,
     shibuichi: 0.947,
-  },
-  // ... similar entries for other materials
+  }
 }
 
 export const materials = [
