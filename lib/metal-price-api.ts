@@ -1,6 +1,6 @@
 import { alloys } from "./alloys"
 
-const API_KEY = "8736bcfc1de4fe5031aa52cc4c906d0f"
+const API_KEY = process.env.NEXT_PUBLIC_METAL_PRICE_API_KEY || "8736bcfc1de4fe5031aa52cc4c906d0f"
 const BASE_URL = "https://api.metalpriceapi.com/v1"
 
 export type MetalPriceResponse = {
