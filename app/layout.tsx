@@ -13,7 +13,10 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "Metal Alloys",
   },
-  generator: 'v0.dev'
+  icons: {
+    icon: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/rounded-Ui8WzEhGncLDllkjAuLfXHquDyvAVU.png",
+    apple: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/rounded-Ui8WzEhGncLDllkjAuLfXHquDyvAVU.png",
+  },
 }
 
 export const viewport: Viewport = {
