@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import ClientPage from "./ClientPage"
+import Calculator from "@/components/calculator"
 
 export const metadata: Metadata = {
   title: "Metal Alloys",
@@ -7,6 +7,16 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  return <ClientPage />
+  return (
+    <div className="container py-8 space-y-8">
+      <div className="space-y-4 text-center">
+        <h1 className="text-4xl font-bold">How much metal do I need?</h1>
+        <p className="text-xl text-muted-foreground">
+          Easily calculate the exact metal required for your jewellery casting.
+        </p>
+      </div>
+      <Calculator />
+    </div>
+  )
 }
 
