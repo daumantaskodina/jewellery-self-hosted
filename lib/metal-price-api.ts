@@ -1,6 +1,6 @@
 import { alloys } from "./alloys"
 
-const API_KEY = process.env.NEXT_PUBLIC_METAL_PRICE_API_KEY || "8736bcfc1de4fe5031aa52cc4c906d0f"
+const API_KEY = process.env.NEXT_PUBLIC_METAL_PRICE_API_KEY || "1d59eef0f9ff848f7feb1a5ecb000a60"
 const BASE_URL = "https://api.metalpriceapi.com/v1"
 
 export type MetalPriceResponse = {
@@ -19,6 +19,7 @@ export type CachedPrices = {
   prices: {
     [key: string]: number
   }
+  isUsingFallback?: boolean
 }
 
 // Only include metals we actually use in calculations
@@ -30,6 +31,17 @@ const METAL_SYMBOLS = {
   XPD: "Palladium", // Palladium
   ZNC: "Zinc",      // Zinc (using fixed price)
   TIN: "Tin"        // Tin (using fixed price)
+}
+
+// Default fallback prices in EUR per gram (to be used when API fails)
+export const DEFAULT_PRICES = {
+  XAU: 57.50,    // Gold (approximately €1,780/oz)
+  XAG: 0.85,     // Silver (approximately €26.5/oz)
+  XPD: 38.50,    // Palladium (approximately €1,200/oz)
+  GER: 2.45,     // Germanium
+  XCU: 0.007,    // Copper
+  ZNC: 0.004,    // Zinc
+  TIN: 0.25      // Tin
 }
 
 // Fixed prices for metals not available in the API (in EUR per gram)
@@ -61,28 +73,36 @@ export async function fetchLatestPrices(): Promise<MetalPriceResponse> {
       throw new Error('Invalid API response format')
     }
 
-    // Extract rates and convert them to EUR per unit
+    // Extract rates and convert them to EUR per gram
     const rates: Record<string, number> = {}
     
     // Process each metal individually to avoid errors if some are missing
     apiMetals.forEach(symbol => {
       const rate = data.rates[symbol]
       if (typeof rate === 'number' && rate > 0) {
-        rates[symbol] = 1 / rate // Convert to EUR per unit
+        // Convert from troy ounces to grams directly here
+        rates[symbol] = troyOunceToGram(1 / rate)
+      } else {
+        // Use default price if API rate is invalid
+        rates[symbol] = DEFAULT_PRICES[symbol as keyof typeof DEFAULT_PRICES]
       }
     })
 
-    if (Object.keys(rates).length === 0) {
-      throw new Error('No valid metal prices found in the API response')
-    }
-
     return {
       ...data,
-      rates
+      rates,
+      success: true
     }
   } catch (error) {
     console.error('Error fetching metal prices:', error)
-    throw error
+    // Return default prices when API fails
+    return {
+      success: false,
+      timestamp: Math.floor(Date.now() / 1000),
+      base: "EUR",
+      rates: { ...DEFAULT_PRICES },
+      unit: "per gram"
+    }
   }
 }
 
@@ -113,9 +133,9 @@ export function troyOunceToGram(pricePerOunce: number): number {
 export function getAllMetalPrices(apiRates: { [key: string]: number }): { [key: string]: number } {
   const prices: { [key: string]: number } = {}
   
-  // Convert API prices from troy ounces to grams
+  // API rates are already in grams at this point, no need to convert
   Object.entries(apiRates).forEach(([symbol, price]) => {
-    prices[symbol] = troyOunceToGram(price)
+    prices[symbol] = price
   })
   
   // Add fixed prices

@@ -63,6 +63,11 @@ export default function MetalPricesDialog({ open, onOpenChange }: MetalPricesDia
               <div className="space-y-2">
                 <h4 className="font-medium leading-none">Last Updated</h4>
                 <p className="text-sm text-muted-foreground">{prices.lastUpdated}</p>
+                {prices.isUsingFallback && (
+                  <p className="text-sm text-yellow-600 dark:text-yellow-500 mt-2">
+                    Note: Using estimated prices as live market data is currently unavailable.
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 {DISPLAY_METALS.map(({ key, name }) => (
@@ -72,7 +77,7 @@ export default function MetalPricesDialog({ open, onOpenChange }: MetalPricesDia
                       {FIXED_PRICES[key] 
                         ? `€${FIXED_PRICES[key].toFixed(2)}/g (estimated)`
                         : prices.prices[key]
-                          ? `€${prices.prices[key].toFixed(2)}/g`
+                          ? `€${prices.prices[key].toFixed(2)}/g${prices.isUsingFallback ? ' (estimated)' : ''}`
                           : "N/A"}
                     </span>
                   </div>

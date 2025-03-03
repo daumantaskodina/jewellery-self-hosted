@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { fetchLatestPrices, getAllMetalPrices, type CachedPrices } from "@/lib/metal-price-api"
+import { fetchLatestPrices, getAllMetalPrices, type CachedPrices, DEFAULT_PRICES } from "@/lib/metal-price-api"
 
 // Use a more persistent cache with timestamp
 let cachedData: CachedPrices | null = null
@@ -36,8 +36,6 @@ const USD_TO_EUR = 0.92 // Approximate conversion rate, should be fetched from A
 
 export async function GET() {
   try {
-    const now = Date.now()
-
     // Return cached data if it exists and we shouldn't update yet
     if (cachedData && !shouldUpdatePrices()) {
       return NextResponse.json(cachedData)
@@ -46,24 +44,23 @@ export async function GET() {
     // Fetch new prices
     const data = await fetchLatestPrices()
     
-    if (!data.success || !data.rates) {
-      throw new Error("Failed to fetch valid metal prices")
-    }
-
     // Get all metal prices, including fixed prices
     const prices = getAllMetalPrices(data.rates)
 
     // Update cache with formatted time
     cachedData = {
-      lastUpdated: getFormattedUpdateTime(data.timestamp),
+      lastUpdated: data.success 
+        ? getFormattedUpdateTime(data.timestamp)
+        : "Using fallback prices - Unable to fetch latest prices",
       timestamp: data.timestamp,
-      prices
+      prices,
+      isUsingFallback: !data.success
     }
 
     return NextResponse.json(cachedData)
 
   } catch (error) {
-    console.error("Error fetching metal prices:", error)
+    console.error("Error in metal prices route:", error)
     
     // If we have cached data, return it even if it's old
     if (cachedData) {
@@ -73,13 +70,15 @@ export async function GET() {
       })
     }
     
-    return NextResponse.json(
-      { 
-        error: error instanceof Error ? error.message : "Failed to fetch metal prices",
-        timestamp: Date.now(),
-        success: false
-      },
-      { status: 500 }
-    )
+    // If all else fails, return default prices
+    const timestamp = Math.floor(Date.now() / 1000)
+    const fallbackData: CachedPrices = {
+      lastUpdated: "Using fallback prices - Unable to fetch latest prices",
+      timestamp,
+      prices: DEFAULT_PRICES,
+      isUsingFallback: true
+    }
+    
+    return NextResponse.json(fallbackData)
   }
 } 
