@@ -1,7 +1,12 @@
 import { alloys } from "./alloys"
 
-const API_KEY = process.env.NEXT_PUBLIC_METAL_PRICE_API_KEY || "1d59eef0f9ff848f7feb1a5ecb000a60"
+// API key should be in environment variables, not hardcoded
+const API_KEY = process.env.METAL_PRICE_API_KEY
 const BASE_URL = "https://api.metalpriceapi.com/v1"
+
+if (!API_KEY) {
+  console.error("METAL_PRICE_API_KEY environment variable is not set")
+}
 
 export type MetalPriceResponse = {
   success: boolean
@@ -56,20 +61,37 @@ export async function fetchLatestPrices(): Promise<MetalPriceResponse> {
   // Only fetch prices for metals available in the API
   const apiMetals = ["XAU", "XAG", "XPD"]
   
+  if (!API_KEY) {
+    console.error('API key not configured')
+    return {
+      success: false,
+      timestamp: Math.floor(Date.now() / 1000),
+      base: "EUR",
+      rates: { ...DEFAULT_PRICES },
+      unit: "per gram"
+    }
+  }
+  
   try {
-    const response = await fetch(
-      `${BASE_URL}/latest?api_key=${API_KEY}&base=EUR&currencies=${apiMetals.join(",")}`
-    )
+    const url = `${BASE_URL}/latest?api_key=${API_KEY}&base=EUR&currencies=${apiMetals.join(",")}`
+    // Don't log the full URL as it contains the API key
+    console.log('Fetching metal prices from external API...')
+    
+    const response = await fetch(url)
+    console.log('Response status:', response.status)
 
     if (!response.ok) {
+      const errorText = await response.text()
+      console.error('API Error Response:', errorText)
       throw new Error(`Failed to fetch metal prices: ${response.statusText}`)
     }
 
     const data = await response.json()
+    console.log('API Response received successfully')
     
     // Add validation for the API response
     if (!data.success || !data.rates || typeof data.rates !== 'object') {
-      console.error('Invalid API response:', data)
+      console.error('Invalid API response format')
       throw new Error('Invalid API response format')
     }
 
@@ -79,6 +101,7 @@ export async function fetchLatestPrices(): Promise<MetalPriceResponse> {
     // Process each metal individually to avoid errors if some are missing
     apiMetals.forEach(symbol => {
       const rate = data.rates[symbol]
+      console.log(`Processing ${symbol}, rate available:`, typeof rate === 'number' && rate > 0)
       if (typeof rate === 'number' && rate > 0) {
         // Convert from troy ounces to grams directly here
         rates[symbol] = troyOunceToGram(1 / rate)

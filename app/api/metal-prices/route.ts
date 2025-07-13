@@ -3,6 +3,7 @@ import { fetchLatestPrices, getAllMetalPrices, type CachedPrices, DEFAULT_PRICES
 
 // Use a more persistent cache with timestamp
 let cachedData: CachedPrices | null = null
+let lastApiCall: number = 0
 
 function shouldUpdatePrices(): boolean {
   if (!cachedData) return true
@@ -16,7 +17,12 @@ function shouldUpdatePrices(): boolean {
                   now.getFullYear() !== lastUpdate.getFullYear()
   const isPastSevenAM = now.getHours() >= 7
   
-  return isNewDay && isPastSevenAM
+  // Also check if we haven't made an API call in the last 12 hours
+  // This prevents multiple API calls on the same day
+  const timeSinceLastCall = Date.now() - lastApiCall
+  const hasBeenTooLongSinceLastCall = timeSinceLastCall > (12 * 60 * 60 * 1000)
+  
+  return isNewDay && isPastSevenAM && hasBeenTooLongSinceLastCall
 }
 
 function getFormattedUpdateTime(timestamp: number): string {
@@ -36,10 +42,18 @@ const USD_TO_EUR = 0.92 // Approximate conversion rate, should be fetched from A
 
 export async function GET() {
   try {
+    // Log the request for monitoring
+    console.log('Metal prices API called at:', new Date().toISOString())
+    
     // Return cached data if it exists and we shouldn't update yet
     if (cachedData && !shouldUpdatePrices()) {
+      console.log('Returning cached data, no API call needed')
       return NextResponse.json(cachedData)
     }
+
+    // Log that we're making an actual API call
+    console.log('Making API call to fetch fresh metal prices')
+    lastApiCall = Date.now()
 
     // Fetch new prices
     const data = await fetchLatestPrices()
@@ -57,6 +71,7 @@ export async function GET() {
       isUsingFallback: !data.success
     }
 
+    console.log('API call completed, cache updated')
     return NextResponse.json(cachedData)
 
   } catch (error) {
@@ -64,6 +79,7 @@ export async function GET() {
     
     // If we have cached data, return it even if it's old
     if (cachedData) {
+      console.log('Returning stale cached data due to error')
       return NextResponse.json({
         ...cachedData,
         isStale: true
@@ -71,6 +87,7 @@ export async function GET() {
     }
     
     // If all else fails, return default prices
+    console.log('Returning fallback prices due to error and no cache')
     const timestamp = Math.floor(Date.now() / 1000)
     const fallbackData: CachedPrices = {
       lastUpdated: "Using fallback prices - Unable to fetch latest prices",
